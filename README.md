@@ -25,3 +25,13 @@ Open Claude Code here and ask for a new endpoint. Typical problems without a set
 3. **Nothing stops a risky edit or an unfinished job.** It asks permission for every routine command, can edit `.env`, and can say "done" without running the tests.
 
 Switch to the `after` branch to see each of these handled.
+
+## What the `after` branch adds
+
+| Friction | Fix |
+|---|---|
+| Guessed commands | `CLAUDE.md` lists the real, verified commands and says there is no build or lint step. |
+| Wrong conventions | `CLAUDE.md` conventions + the `/add-endpoint` skill (`.ts` imports, no frameworks, tests for every route). |
+| Prompts, risky edits, unfinished work | `.claude/settings.json` allows routine commands, denies `.env` reads and force-pushes; hooks block `.env` edits and run the tests before Claude can finish. |
+
+Full details and a 5-minute self-check: [`docs/HANDOVER.md`](docs/HANDOVER.md).
