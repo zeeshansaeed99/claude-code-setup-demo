@@ -4,7 +4,7 @@
 | File | What it does |
 |---|---|
 | `CLAUDE.md` | Project facts Claude reads at the start of every session: commands, layout, conventions, guardrails. |
-| `.claude/settings.json` | Team-shared settings: routine test/start/git commands allowed without prompts; Read-tool access to `.env` files and `git push --force` / `-f` (in that order) denied; two hooks. |
+| `.claude/settings.json` | Team-shared settings: routine test/start/git commands allowed without prompts; Read-tool access to real `.env` files (not `.env.example`) and `git push --force` / `-f` (in that order) denied; two hooks. |
 | `.claude/hooks/block-env-edits.mjs` | Blocks Claude's edit tools on real `.env` files and shell commands that name one. Does not catch commands that reach the file without naming it. |
 | `.claude/hooks/tests-before-stop.mjs` | Runs `npm test` on every attempt to finish. A first failure sends Claude back; a failure after the retry lets it stop with an explicit UNRESOLVED message. |
 | `.claude/skills/add-endpoint` | `/add-endpoint`: adds a route the project's way, tests included. |

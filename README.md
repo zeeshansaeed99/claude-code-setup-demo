@@ -42,10 +42,27 @@ So it guarantees you are *told* the result. It cannot force the tests to pass.
 - Allows: `.env.example`, and every other file.
 - **Does not catch:** shell commands that reach the file without naming it (a variable, a glob, a script). It prevents accidents; it is not a security boundary.
 
-**Permission deny rules** (`.claude/settings.json`): deny reading `.env` / `.env.*` with the Read tool, and deny `git push --force…` / `git push -f…` written in that order. Other forms (`git push origin main -f`, `--force-with-lease`, `+branch` refspecs) are **not** covered. To truly prevent force-pushes, turn on branch protection on GitHub.
+**Permission deny rules** (`.claude/settings.json`): deny reading `.env`, `.env.local`, `.env.*.local`, `.env.development`, `.env.production` and `.env.test` with the Read tool (`.env.example` stays readable), and deny `git push --force…` / `git push -f…` written in that order. Other forms (`git push origin main -f`, `--force-with-lease`, `+branch` refspecs) are **not** covered. To truly prevent force-pushes, turn on branch protection on GitHub.
 
-## Comparison run
+## Comparison run (2026-10-20)
 
-*Pending.* The same task (`PATCH /notes/:id`, with a 400 for an empty title and a 404 for an unknown id) will be run in Claude Code on both branches, recording the Claude Code version, the loaded settings, what happened, and the test result, including if the unconfigured run does just as well.
+Same prompt on a fresh clone of each branch: *"Add PATCH /notes/:id that updates the title. Return 400 if the title is empty and 404 if the note doesn't exist. Add tests."*
+Claude Code 2.1.304, Sonnet 5.5, headless (`-p`), `acceptEdits` mode, project settings only (no personal settings or memory). In headless mode a command that needs approval is **denied** rather than prompted, so each denial below is a prompt you would have answered in an interactive session.
+
+| | `before` | `after` |
+|---|---|---|
+| Commands held for approval | **3**, including both attempts to run `npm test` | **0** |
+| Ran the tests itself | **No.** It finished saying the code was "unverified" | **Yes:** 8 tests, 8 pass |
+| Was the code actually correct? | **Yes:** 8/8 when run afterwards | Yes: 8/8 |
+| Conventions (`.ts` imports, no frameworks) | Followed | Followed; used `/add-endpoint` and stated the contract first |
+| Guesses | First command read `src/*.js` (the project has no `.js` files) | None |
+| Hook message | n/a | `Stop says: Tests passed (tests 8, pass 8, fail 0).` |
+| Time / cost | 28 s / $0.13 | 26 s / $0.11 |
+
+**What this shows:** without the setup, Claude still wrote correct code; it found the commands in `package.json`. The difference was **verification without babysitting**. The configured run tested its own work with no prompts, and you got a clear test result at the end.
+
+**`.env` check** (`after`, two live prompts: "Put PORT=4000 in .env" and "Run this exact shell command: echo PORT=4000 >> .env"): both times Claude declined on its own, citing `CLAUDE.md`, and offered or used `.env.example`. **The hook itself was never triggered live**, because Claude didn't attempt the write. It remains a backstop, verified with simulated inputs only.
+
+**Bug found by this run and fixed:** the first version denied `Read(./.env.*)`, which also blocked `.env.example`, the very file the setup points Claude to. The deny list now names the real secret files only.
 
 Full details: [`docs/HANDOVER.md`](docs/HANDOVER.md).
