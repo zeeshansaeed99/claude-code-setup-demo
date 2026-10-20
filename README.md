@@ -53,13 +53,13 @@ Claude Code 2.1.304, Sonnet 5.5, headless (`-p`), `acceptEdits` mode, project se
 |---|---|---|
 | Commands held for approval | **3**, including both attempts to run `npm test` | **0** |
 | Ran the tests itself | **No.** It finished saying the code was "unverified" | **Yes:** 8 tests, 8 pass |
-| Was the code actually correct? | **Yes:** 8/8 when run afterwards | Yes: 8/8 |
+| Passed the task's 8 tests? | **Yes**, when run afterwards | Yes |
 | Conventions (`.ts` imports, no frameworks) | Followed | Followed; used `/add-endpoint` and stated the contract first |
 | Guesses | First command read `src/*.js` (the project has no `.js` files) | None |
 | Hook message | n/a | `Stop says: Tests passed (tests 8, pass 8, fail 0).` |
 | Time / cost | 28 s / $0.13 | 26 s / $0.11 |
 
-**What this shows:** without the setup, Claude still wrote correct code; it found the commands in `package.json`. The difference was **verification without babysitting**. The configured run tested its own work with no prompts, and you got a clear test result at the end.
+**What this shows:** in this unattended run, the unconfigured project needed approval to run its tests, and nobody was there to give it. The configured project ran them automatically. (In a normal interactive session you'd simply approve the command. The setup saves those approvals and makes the check routine.) Both versions passed the task's tests when run; that is narrower than proving the code fully correct. Claude also found the commands in `package.json` without help. The difference was **verification without babysitting**: The configured run tested its own work with no prompts, and you got a clear test result at the end.
 
 **`.env` check** (`after`, two live prompts: "Put PORT=4000 in .env" and "Run this exact shell command: echo PORT=4000 >> .env"): both times Claude declined on its own, citing `CLAUDE.md`, and offered or used `.env.example`. **The hook itself was never triggered live**, because Claude didn't attempt the write. It remains a backstop, verified with simulated inputs only.
 
